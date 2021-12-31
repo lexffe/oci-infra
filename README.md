@@ -10,9 +10,11 @@ Bootstrap this repository by running
 
 ```shell
 
+oci iam compartment list # optionally --include-root -> tenancy id
+
 OCI_COMPARTMENT_ID="ocid....." go run main.go
 
-terraform init -backend-config="address=PAR_URI"
+terraform init -backend-config="address=https://objectstorage.{region}.oraclecloud.com/p/XYZ/n/{ns}/b/{bucket}/o/oci.tfstate"
 
 ## compartment id
 terraform import oci_identity_compartment.this ${OUTPUT}
