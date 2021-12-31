@@ -92,7 +92,7 @@ func createCompartment(ctx context.Context, c *identity.IdentityClient, parent *
 
 func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, comp *string, tags kv) *string {
 
-	req := objectstorage.GetNamespaceRequest {
+	req := objectstorage.GetNamespaceRequest{
 		CompartmentId: comp,
 	}
 
@@ -107,7 +107,7 @@ func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, comp *stri
 }
 
 func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, comp *string, bn *string, tags kv) {
-	
+
 	req := objectstorage.CreateBucketRequest{
 		NamespaceName: ns,
 		CreateBucketDetails: objectstorage.CreateBucketDetails{
@@ -126,15 +126,15 @@ func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns 
 }
 
 func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, bucket *string, name *string, st io.Reader) {
-	
+
 	manager := transfer.NewUploadManager()
 
-	req := transfer.UploadStreamRequest {
-		UploadRequest: transfer.UploadRequest {
+	req := transfer.UploadStreamRequest{
+		UploadRequest: transfer.UploadRequest{
 			ObjectStorageClient: c,
-			NamespaceName: ns,
-			BucketName: bucket,
-			ObjectName: name,
+			NamespaceName:       ns,
+			BucketName:          bucket,
+			ObjectName:          name,
 		},
 		StreamReader: st,
 	}
@@ -153,23 +153,23 @@ func generatePar(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *
 
 	expiryTime := time.Now().Add(time.Hour)
 
-	sdkTime := common.SDKTime {
+	sdkTime := common.SDKTime{
 		Time: expiryTime,
 	}
 
-	req := objectstorage.CreatePreauthenticatedRequestRequest {
+	req := objectstorage.CreatePreauthenticatedRequestRequest{
 		NamespaceName: ns,
-		BucketName: bucket,
-		CreatePreauthenticatedRequestDetails: objectstorage.CreatePreauthenticatedRequestDetails { 
-			Name: parName,
-			ObjectName: object,
-			AccessType: objectstorage.CreatePreauthenticatedRequestDetailsAccessTypeObjectreadwrite,
+		BucketName:    bucket,
+		CreatePreauthenticatedRequestDetails: objectstorage.CreatePreauthenticatedRequestDetails{
+			Name:        parName,
+			ObjectName:  object,
+			AccessType:  objectstorage.CreatePreauthenticatedRequestDetailsAccessTypeObjectreadwrite,
 			TimeExpires: &sdkTime,
 		},
 	}
 
 	r, err := c.CreatePreauthenticatedRequest(ctx, req)
-	
+
 	if err != nil {
 		log.Fatalln("%v", err)
 	}
