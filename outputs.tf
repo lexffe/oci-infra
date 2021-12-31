@@ -5,5 +5,5 @@ output "oci_state_par" {
 
 output "cf_state_par" {
   description = "State file PAR URI for cf-infra"
-  value       = oci_objectstorage_preauthrequest.cf_infra.access_uri
+  value       = oci_objectstorage_preauthrequest.cf_infra_state.access_uri
 }

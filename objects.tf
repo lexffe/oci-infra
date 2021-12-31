@@ -9,7 +9,7 @@ resource "oci_objectstorage_preauthrequest" "this" {
   time_expires = "2022-06-30T23:59:59.000Z"
 }
 
-resource "oci_objectstorage_object" "cf_state" {
+resource "oci_objectstorage_object" "cf_infra_state" {
   bucket    = oci_objectstorage_bucket.state.name
   namespace = data.oci_objectstorage_namespace.ns.namespace
   object    = "cf-infra.tfstate"
@@ -17,8 +17,8 @@ resource "oci_objectstorage_object" "cf_state" {
   content = "" # content managed by external world
 }
 
-resource "oci_objectstorage_preauthrequest" "cf_state" {
-  object_name  = oci_objectstorage_object.cf_state.object
+resource "oci_objectstorage_preauthrequest" "cf_infra_state" {
+  object_name  = oci_objectstorage_object.cf_infra_state.object
   access_type  = "ObjectReadWrite"
   bucket       = oci_objectstorage_bucket.state.name
   name         = "bootstrap"
