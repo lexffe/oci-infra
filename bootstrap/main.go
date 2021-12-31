@@ -195,5 +195,5 @@ func generatePar(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *
 
 	timeStr, _ := expiryTime.MarshalText()
 
-	log.Printf("Generated PAR %v, expiry date in %v\n", *r.AccessUri, string(timeStr))
+	log.Printf("Generated PAR %v, id %v, expiry date in %v\n", *r.AccessUri, *r.Id, string(timeStr))
 }
