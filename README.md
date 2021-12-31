@@ -19,6 +19,8 @@ echo -e "parent_compartment_ocid = \"ocid...\"" >> terraform.tfvars
 
 OCI_COMPARTMENT_ID="ocid....." go run main.go
 
+echo -e "bootstrap_par_time = \"2021-12-31T18:00:00.123Z\"" >> terraform.tfvars
+
 terraform init -backend-config="address=https://objectstorage.{region}.oraclecloud.com/p/XYZ/n/{ns}/b/{bucket}/o/oci.tfstate"
 
 ## compartment id
@@ -32,6 +34,8 @@ terraform import oci_objectstorage_preauthrequest.bootstrap ${new_par_id}
 
 terraform refresh
 ```
+
+You should create a new PAR with a later expiry date, and re-initialise the backend.
 
 ## Backend
 

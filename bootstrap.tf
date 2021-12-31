@@ -31,5 +31,5 @@ resource "oci_objectstorage_preauthrequest" "bootstrap" {
   bucket       = oci_objectstorage_bucket.state.name
   name         = "bootstrap"
   namespace    = data.oci_objectstorage_namespace.ns.namespace
-  time_expires = timeadd(timestamp(), "336h")
+  time_expires = var.bootstrap_par_time
 }
