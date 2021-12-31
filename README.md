@@ -37,6 +37,10 @@ terraform refresh
 
 You should create a new PAR with a later expiry date, and re-initialise the backend.
 
+```shell
+terraform init -reconfigure -backend-config="address=https://objectstorage.{region}.oraclecloud.com/p/parId/n/ns/b/bucket/o/oci.tfstate"
+```
+
 ## Backend
 
 It is possible to use object storage's S3-compat endpoint as terraform backend, but that introduces some complexity.

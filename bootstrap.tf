@@ -24,12 +24,11 @@ data "oci_objectstorage_object" "state" {
   object    = "oci.tfstate"
 }
 
-# this PAU will always change.
 resource "oci_objectstorage_preauthrequest" "bootstrap" {
   object_name  = data.oci_objectstorage_object.state.object
   access_type  = "ObjectReadWrite"
   bucket       = oci_objectstorage_bucket.state.name
   name         = "bootstrap"
   namespace    = data.oci_objectstorage_namespace.ns.namespace
-  time_expires = var.bootstrap_par_time
+  time_expires = var.bootstrap_par_time # always forces change.
 }
