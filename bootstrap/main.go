@@ -36,22 +36,22 @@ func main() {
 	osClient, err := objectstorage.NewObjectStorageClientWithConfigurationProvider(config)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 
 	idClient, err := identity.NewIdentityClientWithConfigurationProvider(config)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 
 	// Create compartment
 
-	comp := createCompartment(ctx, &idClient, common.String(parentCompartment), common.String("Terraformed Compartment"), common.String("IaC Managed infrastructure"), commonTags)
+	compId := createCompartment(ctx, &idClient, common.String(parentCompartment), common.String("Terraformed Compartment"), common.String("IaC Managed infrastructure"), commonTags)
 
 	// Get OS NS
 
-	ns := getNS(ctx, &osClient, comp, commonTags)
+	ns := getNS(ctx, &osClient, compId, commonTags)
 
 	// Create OS bucket
 
@@ -84,8 +84,10 @@ func createCompartment(ctx context.Context, c *identity.IdentityClient, parent *
 	r, err := c.CreateCompartment(ctx, req)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
+
+	log.Printf("Compartment %v created (%v)\n", *r.Compartment.Name, *r.Compartment.Id)
 
 	return r.Compartment.Id
 }
@@ -99,11 +101,10 @@ func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, comp *stri
 	r, err := c.GetNamespace(ctx, req)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 
 	return r.Value
-
 }
 
 func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, comp *string, bn *string, tags kv) {
@@ -120,9 +121,10 @@ func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns 
 	r, err := c.CreateBucket(ctx, req)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 
+	log.Printf("Bucket %v created (%v)\n", *r.Bucket.Name, *r.Bucket.Id)
 }
 
 func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, bucket *string, name *string, st io.Reader) {
@@ -142,10 +144,10 @@ func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, n
 	r, err := manager.UploadStream(ctx, req)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 
-	log.Println("n/%v/b/%v/o/%v \t etag: %v", ns, bucket, name, r.SinglepartUploadResponse.PutObjectResponse.ETag)
+	log.Printf("n/%v/b/%v/o/%v \t etag: %v\n", *ns, *bucket, *name, *r.SinglepartUploadResponse.PutObjectResponse.ETag)
 
 }
 
@@ -171,9 +173,11 @@ func generatePar(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *
 	r, err := c.CreatePreauthenticatedRequest(ctx, req)
 
 	if err != nil {
-		log.Fatalln("%v", err)
+		log.Fatal(err)
 	}
 	// r.AccessUri
 
-	log.Println("Generated PAR %v, expiry date in %v", r.AccessUri, expiryTime)
+	timeStr, _ := expiryTime.MarshalText()
+
+	log.Printf("Generated PAR %v, expiry date in %v\n", *r.AccessUri, string(timeStr))
 }

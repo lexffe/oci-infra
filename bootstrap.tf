@@ -17,22 +17,19 @@ resource "oci_objectstorage_bucket" "state" {
   versioning     = "Enabled"
 }
 
-resource "oci_objectstorage_object" "state" {
+# Object managed out of band
+data "oci_objectstorage_object" "state" {
   bucket = oci_objectstorage_bucket.state.name
-  source_uri_details {
-    region = var.region
-    namespace = data.oci_objectstorage_namespace.ns.namespace
-    bucket = oci_objectstorage_bucket.state
-  }
+  namespace = data.oci_objectstorage_namespace.ns.namespace
+  object = "oci-infra.tfstate"
 }
 
-# this PAU will always expire "now", i.e. whenever tf apply runs, this PAU will never work. 
-# (this resource should only be used for bootstrapping)
+# this PAU will always change.
 resource "oci_objectstorage_preauthrequest" "bootstrap" {
-  object_name = ""
+  object_name = data.oci_objectstorage_object.state.name
   access_type = "ObjectReadWrite"
   bucket = oci_objectstorage_bucket.state.name
   name = "bootstrap"
   namespace = data.oci_objectstorage_namespace.ns.namespace
-  time_expires = timestamp()
+  time_expires = timeadd(timestamp(), "336h")
 }
