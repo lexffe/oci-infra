@@ -3,7 +3,7 @@
 resource "oci_identity_compartment" "this" {
   compartment_id = var.parent_compartment_ocid
   description    = "IaC Managed infrastructure"
-  name           = "Terraformed Compartment"
+  name           = "terraform-compartment"
 }
 
 data "oci_objectstorage_namespace" "ns" {
