@@ -10,7 +10,12 @@ Bootstrap this repository by running
 
 ```shell
 
+## get parent compartment
 oci iam compartment list # optionally --include-root -> tenancy id
+
+## populate 
+
+echo -e "parent_compartment_ocid = \"ocid...\"" >> terraform.tfvars
 
 OCI_COMPARTMENT_ID="ocid....." go run main.go
 
