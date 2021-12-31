@@ -47,16 +47,21 @@ func main() {
 
 	// Create compartment
 
-	compId := createCompartment(ctx, &idClient, common.String(parentCompartment), common.String("Terraformed Compartment"), common.String("IaC Managed infrastructure"), commonTags)
+	compId := createCompartment(ctx, &idClient, common.String(parentCompartment), common.String("terraform-compartment"), common.String("IaC Managed infrastructure"), commonTags)
+
+	log.Println("sleeping 2 minutes for compartment to initialise")
+	time.Sleep(time.Minute * 2)
 
 	// Get OS NS
+	// https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/understandingnamespaces.htm#Understanding_Object_Storage_Namespaces
+	// "The namespace spans all compartments within a region."
 
-	ns := getNS(ctx, &osClient, compId, commonTags)
+	ns := getNS(ctx, &osClient, common.String(parentCompartment), commonTags)
 
-	// Create OS bucket
+	// Create OS bucket in new compartment
 
 	bucketName := "terraform-state-bucket"
-	createBucket(ctx, &osClient, ns, common.String(parentCompartment), common.String(bucketName), commonTags)
+	createBucket(ctx, &osClient, ns, compId, common.String(bucketName), commonTags)
 
 	// upload empty file to bucket as state file
 
@@ -71,6 +76,8 @@ func main() {
 }
 
 func createCompartment(ctx context.Context, c *identity.IdentityClient, parent *string, name *string, desc *string, tags kv) *string {
+
+	log.Printf("creating compartment %v\n", *name)
 
 	req := identity.CreateCompartmentRequest{
 		CreateCompartmentDetails: identity.CreateCompartmentDetails{
@@ -92,10 +99,12 @@ func createCompartment(ctx context.Context, c *identity.IdentityClient, parent *
 	return r.Compartment.Id
 }
 
-func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, comp *string, tags kv) *string {
+func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, compId *string, tags kv) *string {
+
+	log.Printf("getting ns for compartment %v\n", *compId)
 
 	req := objectstorage.GetNamespaceRequest{
-		CompartmentId: comp,
+		CompartmentId: compId,
 	}
 
 	r, err := c.GetNamespace(ctx, req)
@@ -107,14 +116,17 @@ func getNS(ctx context.Context, c *objectstorage.ObjectStorageClient, comp *stri
 	return r.Value
 }
 
-func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, comp *string, bn *string, tags kv) {
+func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, compId *string, bucket *string, tags kv) {
+
+	log.Printf("creating bucket %v\n", *bucket)
 
 	req := objectstorage.CreateBucketRequest{
 		NamespaceName: ns,
 		CreateBucketDetails: objectstorage.CreateBucketDetails{
-			Name:          bn,
-			CompartmentId: comp,
+			Name:          bucket,
+			CompartmentId: compId,
 			FreeformTags:  tags,
+			Versioning:    objectstorage.CreateBucketDetailsVersioningEnabled,
 		},
 	}
 
@@ -128,6 +140,8 @@ func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns 
 }
 
 func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, bucket *string, name *string, st io.Reader) {
+
+	log.Printf("uploading to bucket %v\n", *bucket)
 
 	manager := transfer.NewUploadManager()
 
@@ -152,6 +166,8 @@ func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, n
 }
 
 func generatePar(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, bucket *string, object *string, parName *string) {
+
+	log.Printf("generating PAR %v for %v\n", *parName, *object)
 
 	expiryTime := time.Now().Add(time.Hour)
 
