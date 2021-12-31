@@ -22,13 +22,13 @@ OCI_COMPARTMENT_ID="ocid....." go run main.go
 terraform init -backend-config="address=https://objectstorage.{region}.oraclecloud.com/p/XYZ/n/{ns}/b/{bucket}/o/oci.tfstate"
 
 ## compartment id
-terraform import oci_identity_compartment.this ${OUTPUT}
+terraform import oci_identity_compartment.this ${new_compartment_id}
 
 ## id: n/{namespaceName}/b/{bucketName}
-terraform import oci_objectstorage_bucket.state ${OUTPUT}
+terraform import oci_objectstorage_bucket.state ${new_bucket_path}
 
 ## id: n/{namespaceName}/b/{bucketName}/p/{parId}
-terraform import oci_objectstorage_preauthrequest.bootstrap ${OUTPUT}
+terraform import oci_objectstorage_preauthrequest.bootstrap ${new_par_id}
 
 terraform refresh
 ```

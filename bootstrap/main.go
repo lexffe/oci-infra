@@ -136,7 +136,7 @@ func createBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns 
 		log.Fatal(err)
 	}
 
-	log.Printf("Bucket %v created (%v)\n", *r.Bucket.Name, *r.Bucket.Id)
+	log.Printf("Bucket n/%v/b/%v created (%v)\n", *r.Bucket.Namespace, *r.Bucket.Name, *r.Bucket.Id)
 }
 
 func uploadToBucket(ctx context.Context, c *objectstorage.ObjectStorageClient, ns *string, bucket *string, name *string, st io.Reader) {
