@@ -21,7 +21,7 @@ resource "oci_objectstorage_bucket" "state" {
 data "oci_objectstorage_object" "state" {
   bucket    = oci_objectstorage_bucket.state.name
   namespace = data.oci_objectstorage_namespace.ns.namespace
-  object    = "oci-infra.tfstate"
+  object    = "oci.tfstate"
 }
 
 # this PAU will always change.
