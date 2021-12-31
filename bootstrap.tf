@@ -26,7 +26,7 @@ data "oci_objectstorage_object" "state" {
 
 # this PAU will always change.
 resource "oci_objectstorage_preauthrequest" "bootstrap" {
-  object_name = data.oci_objectstorage_object.state.name
+  object_name = data.oci_objectstorage_object.state.object
   access_type = "ObjectReadWrite"
   bucket = oci_objectstorage_bucket.state.name
   name = "bootstrap"
