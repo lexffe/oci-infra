@@ -19,17 +19,17 @@ resource "oci_objectstorage_bucket" "state" {
 
 # Object managed out of band
 data "oci_objectstorage_object" "state" {
-  bucket = oci_objectstorage_bucket.state.name
+  bucket    = oci_objectstorage_bucket.state.name
   namespace = data.oci_objectstorage_namespace.ns.namespace
-  object = "oci-infra.tfstate"
+  object    = "oci-infra.tfstate"
 }
 
 # this PAU will always change.
 resource "oci_objectstorage_preauthrequest" "bootstrap" {
-  object_name = data.oci_objectstorage_object.state.object
-  access_type = "ObjectReadWrite"
-  bucket = oci_objectstorage_bucket.state.name
-  name = "bootstrap"
-  namespace = data.oci_objectstorage_namespace.ns.namespace
+  object_name  = data.oci_objectstorage_object.state.object
+  access_type  = "ObjectReadWrite"
+  bucket       = oci_objectstorage_bucket.state.name
+  name         = "bootstrap"
+  namespace    = data.oci_objectstorage_namespace.ns.namespace
   time_expires = timeadd(timestamp(), "336h")
 }
