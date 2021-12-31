@@ -10,9 +10,9 @@ resource "oci_objectstorage_preauthrequest" "this" {
 }
 
 resource "oci_objectstorage_object" "cf_state" {
-  bucket = oci_objectstorage_bucket.state.name
+  bucket    = oci_objectstorage_bucket.state.name
   namespace = data.oci_objectstorage_namespace.ns.namespace
-  object = "cf-infra.tfstate"
+  object    = "cf-infra.tfstate"
 
   content = "" # content managed by external world
 }
